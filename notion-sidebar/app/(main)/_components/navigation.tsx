@@ -1,6 +1,6 @@
 "use client";
 
-import { ElementRef, useRef, useState } from "react";
+import { ElementRef, useRef, useState, useEffect } from "react";
 import { ChevronsLeft, MenuIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -16,7 +16,21 @@ export const Navigation = () => {
   const navbarRef = useRef<ElementRef<"div">>(null);
   
   const [isResetting, setIsResetting] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(isMobile);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (isMobile) {
+      collapse();
+    } else {
+      resetWidth();
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (isMobile) {
+      collapse();
+    }
+  }, [pathname, isMobile]);
 
   const handleMouseDown = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
