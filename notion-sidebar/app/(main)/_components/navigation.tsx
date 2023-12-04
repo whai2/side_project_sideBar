@@ -1,15 +1,31 @@
 "use client";
 
+import {
+  ChevronsLeft,
+  MenuIcon,
+  Plus,
+  PlusCircle,
+  Search,
+  Settings,
+  Trash
+} from "lucide-react";
 import { ElementRef, useRef, useState, useEffect } from "react";
-import { ChevronsLeft, MenuIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 import { cn } from "@/lib/utils";
+
+import { DocumentList } from "./document-list";
+import { Item } from "./item";
 
 export const Navigation = () => {
   const isMobile = useMediaQuery("(max-width: 768px)"); //return boolean
   const pathname = usePathname();
+  const router = useRouter();
 
   const isResizingRef = useRef(false);
   const sidebarRef = useRef<ElementRef<"aside">>(null);
@@ -17,6 +33,8 @@ export const Navigation = () => {
   
   const [isResetting, setIsResetting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const create = useMutation(api.documents.create);
 
   useEffect(() => {
     if (isMobile) {
@@ -93,6 +111,17 @@ export const Navigation = () => {
     }
   }
 
+  const handleCreate = () => {
+    const promise = create({ title: "Untitled" })
+      .then((documentId) => router.push(`/documents/${documentId}`))
+
+    toast.promise(promise, {
+      loading: "Creating a new note...",
+      success: "New note created!",
+      error: "Failed to create a new note."
+    });
+  };
+
   return (
     <>
       <aside
@@ -117,7 +146,7 @@ export const Navigation = () => {
           <p>Action</p>
         </div>
         <div className="mt-4">
-          <p>documnets</p>
+          <DocumentList />
         </div>
         <div 
         onMouseDown={handleMouseDown}
